@@ -1,0 +1,91 @@
+version: '3'
+
+services:
+
+  bitcoind:
+    container_name: bitcoind_rpc
+    build: containers/btc
+    ports:
+      - "8301:8332" # mainnet-rpc
+      - "8401:18332" # testnet-rpc
+    environment:
+      - "PRINTTOCONSOLE=1"
+      - "DISABLEWALLET=1"
+      - "RPCUSER=test"
+      - "RPCPASSWORD=test"
+    command: ""
+    #    command: "--log_level=all -debug=rpc -testnet -rpcallowip=:0 -daemon"
+    volumes:
+      - "${BLOCKCHAIN_DATA_DIR}/bitcoin:/bitcoin/.bitcoin"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.101
+    healthcheck:
+      test: ["CMD", "curl", "-fX", "http://localhost:18332/"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+
+  litecoind:
+    container_name: litecoind_rpc
+    build: containers/ltc
+    ports:
+      - "8302:9332" # mainnet-rpc
+      - "8402:19332" # testnet-rpc
+    command: "-printtoconsole -testnet -rpcuser=test -rpcpassword=test -disablewallet"
+    volumes:
+      - "${BLOCKCHAIN_DATA_DIR}/litecoin:/home/litecoin/.litecoin"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.102
+    healthcheck:
+      test: ["CMD", "curl", "-fX", "http://localhost:19332/"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+
+  geth:
+    container_name: geth_rpc
+    build: containers/eth
+    ports:
+      - "8303:8545" # rpc
+    command: "--rinkeby --debug"
+    volumes:
+      - "${BLOCKCHAIN_DATA_DIR}/ethereum:/root/.ethereum"
+      - "${BLOCKCHAIN_DATA_DIR}/ethash:/root/.ethash"
+      - "${BLOCKCHAIN_DATA_DIR}/rinkeby:/root/.rinkeby"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.103
+    healthcheck:
+      test: ["CMD", "curl", "-fX", "http://localhost:8545/"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  rippled:
+    container_name: rippled_rpc
+    build: containers/xrp
+    ports:
+      - "8304:51234" # rpc
+    volumes:
+      - "${BLOCKCHAIN_DATA_DIR}/ripple:/var/lib/rippled"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.104
+    healthcheck:
+      test: ["CMD", "curl", "-fX", "http://localhost:51234/"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
