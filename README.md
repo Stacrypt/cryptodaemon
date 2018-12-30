@@ -19,14 +19,11 @@ docker-compose build
 ```bash
 docker-compose up -d
 ```
-5. Check status
+5. Open to the Consul web dashboard to monitor your services health:
 ```bash
-docker-compose ps
+http://localhost:9501/
 ```
-6. Follow logs
-```bash
-docker-compose logs -f
-```
+
 
 ### Supported Cryptocurrencies:
 * Bitcoin (bitcoind)
