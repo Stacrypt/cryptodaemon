@@ -9,12 +9,13 @@ services:
       - "8301:8332" # mainnet-rpc
       - "8401:18332" # testnet-rpc
     environment:
-      - "PRINTTOCONSOLE=1"
-      - "DISABLEWALLET=1"
-      - "RPCUSER=test"
-      - "RPCPASSWORD=test"
-    command: ""
-    #    command: "--log_level=all -debug=rpc -testnet -rpcallowip=:0 -daemon"
+      PRINTTOCONSOLE: 1
+      DISABLEWALLET: 1
+      RPCUSER: test
+      RPCPASSWORD: test
+      SERVICE_NAME: bitcoind_service
+      SERVICE_TAGS: bitcoind
+    command: "-testnet -rpcallowip=::/0"
     volumes:
       - "${BLOCKCHAIN_DATA_DIR}/bitcoin:/bitcoin/.bitcoin"
     networks:
@@ -25,6 +26,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    dns_search: consul_server
 
 
   litecoind:
@@ -44,6 +46,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    environment:
+      SERVICE_NAME: litecoind_service
+      SERVICE_TAGS: litecoind
+    dns_search: consul_server
 
 
   geth:
@@ -64,6 +70,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    dns_search: consul_server
+    environment:
+      SERVICE_NAME: geth_service
+      SERVICE_TAGS: geth
 
   rippled:
     container_name: rippled_rpc
@@ -80,6 +90,41 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    dns_search: consul_server
+    environment:
+      SERVICE_NAME: rippled_service
+      SERVICE_TAGS: rippled
+
+
+  consul:
+    container_name: consul_server
+    image: consul:latest
+    volumes:
+      - "./data/consul/config:/consul/config"
+    command: agent -server -dev -ui -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=1
+    ports:
+      - "9501:8500"  # ui
+      - "9601:8400"  # rpc/rest
+      - "54:53/udp"   # dns
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.201
+    environment:
+      SERVICE_NAME: consul_server_service
+      SERVICE_TAGS: consul
+
+  registrator:
+    container_name: registrator
+    command: consul://172.16.238.201:8500
+    image: gliderlabs/registrator:latest
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock"
+    links:
+      - consul
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.202
+
 
 
 networks:
