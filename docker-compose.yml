@@ -17,7 +17,7 @@ services:
       SERVICE_TAGS: bitcoind
     command: "-testnet -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
     volumes:
-      - "${BLOCKCHAIN_DATA_DIR}/bitcoin:/bitcoin/.bitcoin"
+      - "bitcoin_data:/bitcoin"
     networks:
       app_net:
         ipv4_address: 172.16.238.101
@@ -29,28 +29,28 @@ services:
     dns_search: consul_server
 
 
-  litecoind:
-    container_name: litecoind_rpc
-    build: containers/ltc
-    ports:
-      - "8302:9332" # mainnet-rpc
-      - "8402:19332" # testnet-rpc
-    command: "-testnet -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
-    volumes:
-      - "${BLOCKCHAIN_DATA_DIR}/litecoin:/home/litecoin/.litecoin"
-    networks:
-      app_net:
-        ipv4_address: 172.16.238.102
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:19332/"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    environment:
-      SERVICE_NAME: litecoind_service
-      SERVICE_TAGS: litecoind
-    dns_search: consul_server
-
+  #  litecoind:
+  #    container_name: litecoind_rpc
+  #    build: containers/ltc
+  #    ports:
+  #      - "8302:9332" # mainnet-rpc
+  #      - "8402:19332" # testnet-rpc
+  #    command: "-testnet -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+  #    volumes:
+  #      - "${BLOCKCHAIN_DATA_DIR}/litecoin:/home/litecoin/.litecoin"
+  #    networks:
+  #      app_net:
+  #        ipv4_address: 172.16.238.102
+  #    healthcheck:
+  #      test: ["CMD", "curl", "-f", "http://localhost:19332/"]
+  #      interval: 10s
+  #      timeout: 10s
+  #      retries: 3
+  #    environment:
+  #      SERVICE_NAME: litecoind_service
+  #      SERVICE_TAGS: litecoind
+  #    dns_search: consul_server
+  #
 
   geth:
     container_name: geth_rpc
@@ -59,9 +59,7 @@ services:
       - "8303:8545" # rpc
     command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
     volumes:
-      - "${BLOCKCHAIN_DATA_DIR}/ethereum:/root/.ethereum"
-      - "${BLOCKCHAIN_DATA_DIR}/ethash:/root/.ethash"
-      - "${BLOCKCHAIN_DATA_DIR}/rinkeby:/root/.rinkeby"
+      - ethereum_data:/root
     networks:
       app_net:
         ipv4_address: 172.16.238.103
@@ -75,25 +73,25 @@ services:
       SERVICE_NAME: geth_service
       SERVICE_TAGS: geth
 
-  rippled:
-    container_name: rippled_rpc
-    build: containers/xrp
-    ports:
-      - "8304:51234" # rpc
-    volumes:
-      - "${BLOCKCHAIN_DATA_DIR}/ripple:/var/lib/rippled"
-    networks:
-      app_net:
-        ipv4_address: 172.16.238.104
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:51234/"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    dns_search: consul_server
-    environment:
-      SERVICE_NAME: rippled_service
-      SERVICE_TAGS: rippled
+  #  rippled:
+  #    container_name: rippled_rpc
+  #    build: containers/xrp
+  #    ports:
+  #      - "8304:51234" # rpc
+  #    volumes:
+  #      - "${BLOCKCHAIN_DATA_DIR}/ripple:/var/lib/rippled"
+  #    networks:
+  #      app_net:
+  #        ipv4_address: 172.16.238.104
+  #    healthcheck:
+  #      test: ["CMD", "curl", "-f", "http://localhost:51234/"]
+  #      interval: 10s
+  #      timeout: 10s
+  #      retries: 3
+  #    dns_search: consul_server
+  #    environment:
+  #      SERVICE_NAME: rippled_service
+  #      SERVICE_TAGS: rippled
 
 
   consul:
@@ -134,3 +132,14 @@ networks:
       driver: default
       config:
         - subnet: 172.16.238.0/24
+
+volumes:
+  bitcoin_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/bitcoind
+
+  ethereum_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/geth
