@@ -5,6 +5,7 @@ services:
   bitcoind:
     container_name: bitcoind_rpc
     build: containers/btc
+    restart: always
     ports:
       - "8301:8332" # mainnet-rpc
       - "8401:18332" # testnet-rpc
@@ -32,6 +33,7 @@ services:
   #  litecoind:
   #    container_name: litecoind_rpc
   #    build: containers/ltc
+  #    restart: always
   #    ports:
   #      - "8302:9332" # mainnet-rpc
   #      - "8402:19332" # testnet-rpc
@@ -55,6 +57,7 @@ services:
   geth:
     container_name: geth_rpc
     build: containers/eth
+    restart: always
     ports:
       - "8303:8545" # rpc
     command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
@@ -75,6 +78,7 @@ services:
 
   #  rippled:
   #    container_name: rippled_rpc
+  #    restart: always
   #    build: containers/xrp
   #    ports:
   #      - "8304:51234" # rpc
@@ -97,6 +101,7 @@ services:
   consul:
     container_name: consul_server
     image: consul:latest
+    restart: always
     volumes:
       - "./data/consul/config:/consul/config"
     command: agent -server -dev -ui -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=1
@@ -113,6 +118,7 @@ services:
 
   registrator:
     container_name: registrator
+    restart: always
     command: consul://172.16.238.201:8500
     image: gliderlabs/registrator:latest
     volumes:
