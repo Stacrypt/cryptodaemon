@@ -15,7 +15,7 @@ services:
       RPCPASSWORD: test
       SERVICE_NAME: bitcoind_service
       SERVICE_TAGS: bitcoind
-    command: "-testnet -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+    command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
     volumes:
       - "bitcoin_data:/bitcoin"
     networks:

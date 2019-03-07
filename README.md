@@ -24,6 +24,10 @@ docker-compose up -d
 http://localhost:9501/
 ```
 
+**For installation with local-persist, install the plugin instead if step 2:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/CWSpear/local-persist/master/scripts/install.sh | sudo bash
+```
 
 ### Supported Cryptocurrencies:
 * Bitcoin (bitcoind)
