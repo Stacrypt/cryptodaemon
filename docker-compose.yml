@@ -17,7 +17,7 @@ services:
       RPCPASSWORD: test
       SERVICE_NAME: bitcoind_service
       SERVICE_TAGS: bitcoind
-    command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://127.0.0.1:28332"
+    command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
       - "bitcoin_data:/bitcoin"
     networks:
