@@ -2,14 +2,43 @@ version: '3'
 
 services:
 
+  bitcoind-testnet:
+    container_name: bitcoind_rpc_testnet
+    build: containers/btc
+    restart: always
+    ports:
+#      - "8301:8332" # mainnet-rpc
+      - "8401:18332" # testnet-rpc
+#      - "28332:28332" # zmq
+    environment:
+      PRINTTOCONSOLE: 1
+      DISABLEWALLET: 0
+      RPCUSER: test
+      RPCPASSWORD: test
+      SERVICE_NAME: bitcoind_testnet_service
+      SERVICE_TAGS: bitcoind_testnet
+    command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
+    volumes:
+      - "bitcoin_testnet_data:/bitcoin-testnet"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.101
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 3
+    dns_search: consul_server
+
+
   bitcoind:
     container_name: bitcoind_rpc
     build: containers/btc
     restart: always
     ports:
       - "8301:8332" # mainnet-rpc
-      - "8401:18332" # testnet-rpc
-      - "28332:28332" # zmq
+#      - "8401:18332" # testnet-rpc
+#      - "28332:28332" # zmq
     environment:
       PRINTTOCONSOLE: 1
       DISABLEWALLET: 0
@@ -17,17 +46,17 @@ services:
       RPCPASSWORD: test
       SERVICE_NAME: bitcoind_service
       SERVICE_TAGS: bitcoind
-    command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
+    command: "-prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
       - "bitcoin_data:/bitcoin"
     networks:
       app_net:
-        ipv4_address: 172.16.238.101
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
+        ipv4_address: 172.16.238.102
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 3
     dns_search: consul_server
 
 
@@ -55,27 +84,27 @@ services:
   #    dns_search: consul_server
   #
 
-  geth:
-    container_name: geth_rpc
+  geth-rinkeby:
+    container_name: geth_rinkeby_rpc
     build: containers/eth
     restart: always
     ports:
       - "8303:8545" # rpc
     command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
     volumes:
-      - ethereum_data:/root
+      - ethereum_rinkeby_data:/root
     networks:
       app_net:
-        ipv4_address: 172.16.238.103
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
+        ipv4_address: 172.16.238.111
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 3
     dns_search: consul_server
     environment:
-      SERVICE_NAME: geth_service
-      SERVICE_TAGS: geth
+      SERVICE_NAME: geth_rinkeby_service
+      SERVICE_TAGS: geth_rinkeby
 
   #  rippled:
   #    container_name: rippled_rpc
@@ -141,12 +170,17 @@ networks:
         - subnet: 172.16.238.0/24
 
 volumes:
+  bitcoin_testnet_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/bitcoind-testnet
+
   bitcoin_data:
     driver: local-persist
     driver_opts:
-      mountpoint: /mnt/bitcoind
+      mountpoint: /mnt/bitcoind-mainnet
 
-  ethereum_data:
+  ethereum_rinkeby_data:
     driver: local-persist
     driver_opts:
-      mountpoint: /mnt/geth
+      mountpoint: /mnt/geth-testnet
