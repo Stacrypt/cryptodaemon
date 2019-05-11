@@ -19,7 +19,7 @@ services:
       SERVICE_TAGS: bitcoind_testnet
     command: "-testnet -prune=10000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
-      - "bitcoin_testnet_data:/bitcoin-testnet"
+      - "bitcoin_testnet_data:/bitcoin"
     networks:
       app_net:
         ipv4_address: 172.16.238.101
