@@ -7,7 +7,7 @@ services:
     build: containers/btc
     restart: always
     ports:
-#      - "8301:8332" # mainnet-rpc
+      #      - "8301:8332" # mainnet-rpc
       - "8401:18332" # testnet-rpc
       - "28432:28332" # zmq
     environment:
@@ -23,11 +23,11 @@ services:
     networks:
       app_net:
         ipv4_address: 172.16.238.101
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
+    #    healthcheck:
+    #      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
+    #      interval: 10s
+    #      timeout: 10s
+    #      retries: 3
     dns_search: consul_server
 
 
@@ -37,10 +37,10 @@ services:
     restart: always
     ports:
       - "8301:8332" # mainnet-rpc
-#      - "8401:18332" # testnet-rpc
+      #      - "8401:18332" # testnet-rpc
       - "28332:28332" # zmq
     environment:
-      PRINTTOCONSOLE: 1
+      PRINTTOC  ONSOLE: 1
       DISABLEWALLET: 0
       RPCUSER: test
       RPCPASSWORD: test
@@ -52,40 +52,60 @@ services:
     networks:
       app_net:
         ipv4_address: 172.16.238.102
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
+    #    healthcheck:
+    #      test: ["CMD", "curl", "-f", "http://localhost:18332/"]
+    #      interval: 10s
+    #      timeout: 10s
+    #      retries: 3
     dns_search: consul_server
 
 
-  #  litecoind:
-  #    container_name: litecoind_rpc
-  #    build: containers/ltc
-  #    restart: always
-  #    ports:
-  #      - "8302:9332" # mainnet-rpc
-  #      - "8402:19332" # testnet-rpc
-  #    command: "-testnet -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
-  #    volumes:
-  #      - "${BLOCKCHAIN_DATA_DIR}/litecoin:/home/litecoin/.litecoin"
-  #    networks:
-  #      app_net:
-  #        ipv4_address: 172.16.238.102
-  #    healthcheck:
-  #      test: ["CMD", "curl", "-f", "http://localhost:19332/"]
-  #      interval: 10s
-  #      timeout: 10s
-  #      retries: 3
-  #    environment:
-  #      SERVICE_NAME: litecoind_service
-  #      SERVICE_TAGS: litecoind
-  #    dns_search: consul_server
-  #
+  litecoind-testnet:
+    container_name: litecoind_rpc_testnet
+    build: containers/ltc
+    restart: always
+    ports:
+      - "8411:19332" # testnet-rpc
+      - "8412:19333" # testnet-p2p
+    command: "-testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+    volumes:
+      - "litecoin_testnet_data:/home/litecoin/.litecoin"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.121
+    dns_search: consul_server
+
+#  litecoind:
+#    container_name: litecoind_rpc
+#    build: containers/ltc
+#    restart: always
+#    ports:
+#      - "8311:9332" # mainnet-rpc
+#      - "8311:9333" # mainnet-p2p
+#    command: "-printtoconsole -prune=20000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+#    volumes:
+#      - "litecoin_data:/home/litecoin/.litecoin"
+#    networks:
+#      app_net:
+#        ipv4_address: 172.16.238.122
+#    dns_search: consul_server
+
+  bitcoincashd-testnet:
+    container_name: bitcoincashd_rpc_testnet
+    build: containers/bch
+    restart: always
+    ports:
+      - "8451:18332" # testnet-rpc
+    command: "-testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+    volumes:
+      - "bitcoincash_testnet_data:/opt/bitcoinabc/data"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.131
+    dns_search: consul_server
 
   geth-rinkeby:
-    container_name: geth_rinkeby_rpc
+    container_name: geth_rpc_rinkeby
     build: containers/eth
     restart: always
     ports:
@@ -96,15 +116,37 @@ services:
     networks:
       app_net:
         ipv4_address: 172.16.238.111
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
+    #    healthcheck:
+    #      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
+    #      interval: 10s
+    #      timeout: 10s
+    #      retries: 3
     dns_search: consul_server
     environment:
       SERVICE_NAME: geth_rinkeby_service
       SERVICE_TAGS: geth_rinkeby
+
+#  geth:
+#    container_name: geth_rpc
+#    build: containers/eth
+#    restart: always
+#    ports:
+#      - "8303:8545" # rpc
+#    command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
+#    volumes:
+#      - ethereum_rinkeby_data:/root
+#    networks:
+#      app_net:
+#        ipv4_address: 172.16.238.112
+#    #    healthcheck:
+#    #      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
+#    #      interval: 10s
+#    #      timeout: 10s
+#    #      retries: 3
+#    dns_search: consul_server
+#    environment:
+#      SERVICE_NAME: geth_rinkeby_service
+#      SERVICE_TAGS: geth_rinkeby
 
   #  rippled:
   #    container_name: rippled_rpc
@@ -184,3 +226,29 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: /mnt/geth-testnet
+
+#  ethereum_data:
+#    driver: local-persist
+#    driver_opts:
+#      mountpoint: /mnt/geth-mainnet
+
+  bitcoincash_testnet_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/bitocincashd-testnet
+
+#  bitcoincash_data:
+#    driver: local-persist
+#    driver_opts:
+#      mountpoint: /mnt/bitocincashd-mainnet
+
+  litecoin_testnet_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/litecoind-testnet
+
+#  litecoin_testnet:
+#    driver: local-persist
+#    driver_opts:
+#      mountpoint: /mnt/litecoind-mainnet
+
