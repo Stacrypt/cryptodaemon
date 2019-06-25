@@ -40,7 +40,7 @@ services:
       #      - "8401:18332" # testnet-rpc
       - "28332:28332" # zmq
     environment:
-      PRINTTOC  ONSOLE: 1
+      PRINTTOCONSOLE: 1
       DISABLEWALLET: 0
       RPCUSER: test
       RPCPASSWORD: test
@@ -67,7 +67,7 @@ services:
     ports:
       - "8411:19332" # testnet-rpc
       - "8412:19333" # testnet-p2p
-    command: "-testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+    command: "-disablewallet -testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
     volumes:
       - "litecoin_testnet_data:/home/litecoin/.litecoin"
     networks:
@@ -82,7 +82,7 @@ services:
 #    ports:
 #      - "8311:9332" # mainnet-rpc
 #      - "8311:9333" # mainnet-p2p
-#    command: "-printtoconsole -prune=20000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+#    command: "-disablewallet -printtoconsole -prune=20000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
 #    volumes:
 #      - "litecoin_data:/home/litecoin/.litecoin"
 #    networks:
@@ -96,12 +96,28 @@ services:
     restart: always
     ports:
       - "8451:18332" # testnet-rpc
-    command: "-testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+      - "28452:28332" # zmq
+    command: "-disablewallet -testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
       - "bitcoincash_testnet_data:/opt/bitcoinabc/data"
     networks:
       app_net:
         ipv4_address: 172.16.238.131
+    dns_search: consul_server
+
+  bitcoincashd:
+    container_name: bitcoincashd_rpc
+    build: containers/bch
+    restart: always
+    ports:
+      - "8351:8332" # mainnet-rpc
+      - "28352:28332" # zmq
+    command: "-disablewallet -prune=20000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
+    volumes:
+      - "bitcoincash_data:/opt/bitcoinabc/data"
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.132
     dns_search: consul_server
 
   geth-rinkeby:
@@ -237,10 +253,10 @@ volumes:
     driver_opts:
       mountpoint: /mnt/bitocincashd-testnet
 
-#  bitcoincash_data:
-#    driver: local-persist
-#    driver_opts:
-#      mountpoint: /mnt/bitocincashd-mainnet
+  bitcoincash_data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: /mnt/bitocincashd-mainnet
 
   litecoin_testnet_data:
     driver: local-persist
