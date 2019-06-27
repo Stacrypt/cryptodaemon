@@ -75,20 +75,20 @@ services:
         ipv4_address: 172.16.238.121
     dns_search: consul_server
 
-#  litecoind:
-#    container_name: litecoind_rpc
-#    build: containers/ltc
-#    restart: always
-#    ports:
-#      - "8311:9332" # mainnet-rpc
-#      - "8311:9333" # mainnet-p2p
-#    command: "-disablewallet -printtoconsole -prune=20000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
-#    volumes:
-#      - "litecoin_data:/home/litecoin/.litecoin"
-#    networks:
-#      app_net:
-#        ipv4_address: 172.16.238.122
-#    dns_search: consul_server
+  #  litecoind:
+  #    container_name: litecoind_rpc
+  #    build: containers/ltc
+  #    restart: always
+  #    ports:
+  #      - "8311:9332" # mainnet-rpc
+  #      - "8311:9333" # mainnet-p2p
+  #    command: "-disablewallet -printtoconsole -prune=20000 -rpcuser=test -rpcpassword=test -rpcallowip=::/0"
+  #    volumes:
+  #      - "litecoin_data:/home/litecoin/.litecoin"
+  #    networks:
+  #      app_net:
+  #        ipv4_address: 172.16.238.122
+  #    dns_search: consul_server
 
   bitcoincashd-testnet:
     container_name: bitcoincashd_rpc_testnet
@@ -97,7 +97,7 @@ services:
     ports:
       - "8451:18332" # testnet-rpc
       - "28452:28332" # zmq
-    command: "-disablewallet -testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
+    command: "-datadir=/opt/bitcoinabc/data -disablewallet -testnet -prune=10000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
       - "bitcoincash_testnet_data:/opt/bitcoinabc/data"
     networks:
@@ -112,7 +112,7 @@ services:
     ports:
       - "8351:8332" # mainnet-rpc
       - "28352:28332" # zmq
-    command: "-disablewallet -prune=20000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
+    command: "-datadir=/opt/bitcoinabc/data -disablewallet -prune=30000 -printtoconsole -rpcuser=test -rpcpassword=test -rpcallowip=::/0 -zmqpubrawtx=tcp://0.0.0.0:28332 -zmqpubrawblock=tcp://0.0.0.0:28332 -zmqpubhashblock=tcp://0.0.0.0:28332 -zmqpubhashtx=tcp://0.0.0.0:28332"
     volumes:
       - "bitcoincash_data:/opt/bitcoinabc/data"
     networks:
@@ -142,27 +142,27 @@ services:
       SERVICE_NAME: geth_rinkeby_service
       SERVICE_TAGS: geth_rinkeby
 
-#  geth:
-#    container_name: geth_rpc
-#    build: containers/eth
-#    restart: always
-#    ports:
-#      - "8303:8545" # rpc
-#    command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
-#    volumes:
-#      - ethereum_rinkeby_data:/root
-#    networks:
-#      app_net:
-#        ipv4_address: 172.16.238.112
-#    #    healthcheck:
-#    #      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
-#    #      interval: 10s
-#    #      timeout: 10s
-#    #      retries: 3
-#    dns_search: consul_server
-#    environment:
-#      SERVICE_NAME: geth_rinkeby_service
-#      SERVICE_TAGS: geth_rinkeby
+  #  geth:
+  #    container_name: geth_rpc
+  #    build: containers/eth
+  #    restart: always
+  #    ports:
+  #      - "8303:8545" # rpc
+  #    command: "--rinkeby --debug --rpc --rpcport 8545 --rpcaddr 0.0.0.0 --rpccorsdomain \"*\" --rpcapi \"eth,web3\""
+  #    volumes:
+  #      - ethereum_rinkeby_data:/root
+  #    networks:
+  #      app_net:
+  #        ipv4_address: 172.16.238.112
+  #    #    healthcheck:
+  #    #      test: ["CMD", "curl", "-f", "http://localhost:8545/"]
+  #    #      interval: 10s
+  #    #      timeout: 10s
+  #    #      retries: 3
+  #    dns_search: consul_server
+  #    environment:
+  #      SERVICE_NAME: geth_rinkeby_service
+  #      SERVICE_TAGS: geth_rinkeby
 
   #  rippled:
   #    container_name: rippled_rpc
@@ -243,20 +243,20 @@ volumes:
     driver_opts:
       mountpoint: /mnt/geth-testnet
 
-#  ethereum_data:
-#    driver: local-persist
-#    driver_opts:
-#      mountpoint: /mnt/geth-mainnet
+  #  ethereum_data:
+  #    driver: local-persist
+  #    driver_opts:
+  #      mountpoint: /mnt/geth-mainnet
 
   bitcoincash_testnet_data:
     driver: local-persist
     driver_opts:
-      mountpoint: /mnt/bitocincashd-testnet
+      mountpoint: /mnt/bitcoincashd-testnet
 
   bitcoincash_data:
     driver: local-persist
     driver_opts:
-      mountpoint: /mnt/bitocincashd-mainnet
+      mountpoint: /mnt/bitcoincashd-mainnet
 
   litecoin_testnet_data:
     driver: local-persist
